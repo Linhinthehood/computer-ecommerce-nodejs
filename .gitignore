@@ -1,38 +1,57 @@
 # Dependencies
-/node_modules
+node_modules/
+jspm_packages/
 /.pnp
-.pnp.js
+.pnp.*
+bower_components
 
 # Testing
-/coverage
+coverage
+*.lcov
+.nyc_output
 
 # Next.js
-/.next/
-/out/
+.next
+out
 
 # Production
-/build
+build/
+dist/
 
 # Misc
 .DS_Store
 *.pem
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
 
 # Debug
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Local env files
-.env*.local
-.env
+lerna-debug.log*
+.pnpm-debug.log*
 
 # IDE
 .vscode/
 .idea/
+.vscode-test
 
-# Vercel
-.vercel
+# Cache
+.cache
+.parcel-cache
+.temp
+.docusaurus
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts 
+.yarn/
+.yarn-integrity

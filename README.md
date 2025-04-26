@@ -1,4 +1,4 @@
-# Project NodeJS: E-commerce clothing website
+# Project NodeJS: Computer ecommerce website
 
 ## Team members:
 - Hồ Phạm Đức Linh: 522k0002
@@ -10,7 +10,7 @@
 ### (Recommended) Docker Setup:
 1. Clone the repository
   ```bash
-   git clone https://github.com/Linhinthehood/ProjectNodeJS.git
+   git clone https://github.com/Linhinthehood/computer-ecommerce-nodejs.git
   ```
 2. Build and run with Docker Compose:
    ```bash
