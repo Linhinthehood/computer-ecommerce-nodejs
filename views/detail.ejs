@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= product.name %>
+    </title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-weight: 100;
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .product-slider {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slider-container {
+            display: flex;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .slider-item {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            border: none;
+            outline: none;
+        }
+
+        .slider-nav:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .slider-nav-left {
+            left: 10px;
+        }
+
+        .slider-nav-right {
+            right: 10px;
+        }
+
+        .thumbnail-slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 10px 0;
+            scrollbar-width: thin;
+        }
+
+        .thumbnail-slider::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .thumbnail-slider::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .thumbnail {
+            flex: 0 0 50px;
+            /* Adjust to a smaller size */
+            height: 50px;
+            /* Ensure consistent height */
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .thumbnail.active {
+            opacity: 1;
+            border: 2px solid #0d6efd;
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 500;
+        }
+
+        .fw-normal {
+            font-weight: 400 !important;
+        }
+
+        .fw-medium {
+            font-weight: 500 !important;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-uppercase" href="/">We Sell Clothes</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/">All Products</a></li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item" href="/">New Arrivals</a></li>
+                            <li><a class="dropdown-item" href="/shirts">Shirts</a></li>
+                            <li><a class="dropdown-item" href="/bottoms">Bottoms</a></li>
+                            <li><a class="dropdown-item" href="/outerwears">Outerwears</a></li>
+                            <li><a class="dropdown-item" href="/accessories">Accessories</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/aboutus">About</a></li>
+                </ul>
+
+                <!-- Phần search -->
+                <form class="d-flex me-3" action="/search" method="GET">
+                    <input class="form-control form-control-sm border-dark" type="search" name="query" placeholder="Search"
+                        aria-label="Search" required>
+                    <button class="btn btn-dark btn-sm ms-2" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+
+                <!-- Phần đăng nhập và giỏ hàng -->
+                <div class="d-flex align-items-center gap-3">
+                    <% if (user) { %>
+                        <div class="dropdown">
+                            <a href="#" class="text-dark fw-bold text-uppercase small dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                                <%= user.name %>  <i class="bi bi-person-fill fs-4"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            </ul>
+                        </div>
+                    <% } else { %>
+                        <a href="/auth" class="text-dark fw-bold text-uppercase small">
+                            Login / Register <i class="bi bi-person-fill fs-4"></i>
+                        </a>
+                    <% } %>
+                    <button id="cartButton" class="btn btn-dark btn-sm ms-2">
+                        <i class="bi bi-cart-fill me-1"></i>
+                        <span id="cartCount" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div style="margin-top: 60px;"></div>
+    <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a href="/<%= product.type%>" class="text-decoration-none">
+                        <%= product.type%>
+                    </a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <%= product.name %>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <!-- for each section -->
+    <main class="container main-container py-4 bg-white shadow rounded my-3">
+        <div class="row">
+            <!-- Product Images Section -->
+            <div class="col-12 col-md-6 mb-4">
+                <div class="product-slider">
+                    <button class="slider-nav slider-nav-left" id="prevSlide">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="slider-container" id="imageSlider">
+                        <% product.images.forEach((img, index)=> { %>
+                            <div class="slider-item" style="height: 575px;">
+                                <img src="<%= img %>" class="img-fluid rounded"
+                                    alt="<%= product.name %> - View <%= index + 1 %>">
+                            </div>
+                            <% }); %>
+                    </div>
+                    <button class="slider-nav slider-nav-right" id="nextSlide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Thumbnail Images -->
+                <div class="thumbnail-slider mt-3" id="thumbnailSlider">
+                    <% product.images.forEach((img, index)=> { %>
+                        <img src="<%= img %>" class="img-fluid rounded thumbnail <%= index === 0 ? 'active' : '' %>"
+                            data-index="<%= index %>" alt="Thumbnail <%= index + 1 %>">
+                        <% }); %>
+                </div>
+            </div>
+
+            <!-- Product Details Section -->
+            <div class="col-12 col-md-6">
+                <div class="ps-md-4">
+                    <!-- Brand -->
+                    <div class="text-muted mb-1">We Sell Clothes Collection</div>
+
+                    <!-- Product Title -->
+                    <h2 class="fw-medium mb-2">
+                        <%= product.name %>
+                    </h2>
+
+                    <!-- Price -->
+                    <div class="fs-4 mb-3">
+                        <span class="text fw-medium">
+                            <p class="fs-5">
+                                <%= product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "." ) %> ₫
+                            </p>
+                        </span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="mb-4">
+                        A premium quality, comfortable cotton t-shirt that's perfect for everyday wear.
+                        Made from 100% organic cotton with a relaxed fit and breathable fabric.
+                    </p>
+
+                    <!-- Conditionally Show Size Options -->
+                    <% if (product.type !=="Accessories" ) { %>
+                        <div class="mb-4">
+                            <h6 class="fw-medium">Size:</h6>
+                            <div class="btn-group" role="group" aria-label="Size options" id="sizeInput">
+                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
+                                    id="sizeS-<%= product._id %>" value="S" autocomplete="off">
+                                <label class="btn btn-outline-dark" for="sizeS-<%= product._id %>">S</label>
+
+                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
+                                    id="sizeM-<%= product._id %>" value="M" autocomplete="off">
+                                <label class="btn btn-outline-dark" for="sizeM-<%= product._id %>">M</label>
+
+                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
+                                    id="sizeL-<%= product._id %>" value="L" autocomplete="off">
+                                <label class="btn btn-outline-dark" for="sizeL-<%= product._id %>">L</label>
+
+                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
+                                    id="sizeXL-<%= product._id %>" value="XL" autocomplete="off">
+                                <label class="btn btn-outline-dark" for="sizeXL-<%= product._id %>">XL</label>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <div class="d-flex mb-4 align-items-center">
+                                <!-- Quantity -->
+                                <div class="input-group me-3" style="width: 130px;">
+                                    <button class="btn btn-outline-dark" type="button" id="decreaseQuantity">-</button>
+                                    <input type="text" class="form-control text-center" id="quantityInput" value="1">
+                                    <button class="btn btn-outline-dark" type="button" id="increaseQuantity">+</button>
+                                </div>
+                                <!-- Add to Cart Button -->
+                                <button class="btn btn-success flex-grow-1 addToCart" data-id="<%= product._id %>"
+                                    data-name="<%= product.name %>" data-price="<%= product.price %>"
+                                    data-thumbnail="<%= product.thumbnail %>" data-type="<%= product.type %>">
+                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                </button>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <div class="d-flex flex-wrap mb-4">
+                                <div class="me-4 mb-2">
+                                    <i class="fas fa-truck text-muted me-2"></i>
+                                    <span>Free shipping</span>
+                                </div>
+                                <div class="me-4 mb-2">
+                                    <i class="fas fa-undo text-muted me-2"></i>
+                                    <span>30 days return</span>
+                                </div>
+                                <div class="mb-2">
+                                    <i class="fas fa-check-circle text-muted me-2"></i>
+                                    <span>In stock</span>
+                                </div>
+                            </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Tabs -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                            data-bs-target="#description" type="button" role="tab" aria-controls="description"
+                            aria-selected="true">Description</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
+                            type="button" role="tab" aria-controls="details" aria-selected="false">Details</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-4 border border-top-0 rounded-bottom" id="productTabsContent">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel"
+                        aria-labelledby="description-tab">
+                        <p>This premium cotton t-shirt combines style and comfort for everyday wear. Crafted with 100%
+                            organic cotton, it features a classic cut with a modern fit that flatters all body types.
+                        </p>
+                        <p>The breathable fabric ensures all-day comfort, whether you're running errands or meeting
+                            friends for coffee. The relaxed fit provides freedom of movement while maintaining a stylish
+                            silhouette.</p>
+                        <p>Pre-shrunk and machine washable, this t-shirt is designed to last through countless wears and
+                            washes without losing its shape or color vibrancy.</p>
+                    </div>
+                    <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <h5 class="fw-medium mb-3">Product Specifications</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><span class="fw-medium">Material:</span> 100% Organic Cotton</li>
+                                    <li class="mb-2"><span class="fw-medium">Weight:</span> 180 GSM</li>
+                                    <li class="mb-2"><span class="fw-medium">Fit:</span> Regular</li>
+                                    <li class="mb-2"><span class="fw-medium">Neckline:</span> Crew Neck</li>
+                                    <li class="mb-2"><span class="fw-medium">Sleeve Type:</span> Short Sleeve</li>
+                                    <li class="mb-2"><span class="fw-medium">Pattern:</span> Solid</li>
+                                </ul>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <h5 class="fw-medium mb-3">Care Instructions</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-tint text-muted me-2"></i> Machine wash cold</li>
+                                    <li class="mb-2"><i class="fas fa-ban text-muted me-2"></i> Do not bleach</li>
+                                    <li class="mb-2"><i class="fas fa-temperature-low text-muted me-2"></i> Tumble dry
+                                        low</li>
+                                    <li class="mb-2"><i class="fas fa-iron text-muted me-2"></i> Iron on low heat</li>
+                                    <li class="mb-2"><i class="fas fa-times text-muted me-2"></i> Do not dry clean</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- You May Also Like Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="fw-medium mb-4">You May Also Like</h3>
+                <div class="row row-cols-2 row-cols-md-4 g-4">
+                    <!-- Related Product 1 -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/assets/shirts/Hoodies1.png" class="card-img-top" alt="Related Product 1">
+                            <div class="card-body">
+                                <h6 class="card-title ">Slim Fit Jeans</h6>
+
+                                <p class="fw-medium">600.000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Product 2 -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/assets/shirts/Hoodies2.png" class="card-img-top" alt="Related Product 2">
+                            <div class="card-body">
+                                <h6 class="card-title">Casual Hooded Sweatshirt</h6>
+
+                                <p class="fw-medium">600.000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Product 3 -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/assets/shirts/Shirt1.png" class="card-img-top" alt="Related Product 3">
+                            <div class="card-body">
+                                <h6 class="card-title">Long Sleeve Polo Shirt</h6>
+
+                                <p class="fw-medium">350.000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Product 4 -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="/assets/shirts/Tanktop1.png" class="card-img-top" alt="Related Product 4">
+                            <div class="card-body">
+                                <h6 class="card-title">Lightweight Jacket</h6>
+
+                                <p class="fw-medium">200.000</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-light py-5 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3 fw-bold">We Sell Clothes</h5>
+                    <p>Quality clothing for everyday wear. Our products are designed with comfort and style in mind.</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-light"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <h6 class="fw-bold mb-3">SHOP</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Tops</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Bottoms</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Outerwears</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Accessories</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">New Arrivals</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-2 mb-3 mb-md-0">
+                    <h6 class="fw-bold mb-3">CUSTOMER CARE</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">FAQs</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Returns & Exchanges</a>
+                        </li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Shipping Info</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Size Guide</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-4">
+                    <h6 class="fw-bold mb-3">NEWSLETTER</h6>
+                    <p>Subscribe to receive updates, access to exclusive deals, and more.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Your email address" aria-label="Email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="fw-bold mb-2">WE ACCEPT</h6>
+                        <div class="d-flex gap-2">
+                            <i class="fab fa-cc-visa fa-2x"></i>
+                            <i class="fab fa-cc-mastercard fa-2x"></i>
+                            <i class="fab fa-cc-amex fa-2x"></i>
+                            <i class="fab fa-cc-paypal fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4 border-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; 2025 TDT. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal giỏ hàng -->
+    <div id="cartModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Giỏ hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="cartItems" class="list-group"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button id="clearCart" class="btn btn-danger me-auto">Xóa tất cả</button>
+                    <a href="/cart" class="btn btn-primary">Go to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/main.js"></script>
+</body>
+
+</html>

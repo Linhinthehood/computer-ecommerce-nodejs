@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Load Balancer Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .instance {
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        #instance1 { background-color: #ffebee; }
+        #instance2 { background-color: #e8f5e9; }
+        #instance3 { background-color: #e3f2fd; }
+        .active {
+            transform: scale(1.02);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .request-log {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .request-entry {
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .stat-box {
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Load Balancer Demo</h1>
+    <p>This demo shows how requests are distributed across different instances of your application.</p>
+    
+    <button onclick="startDemo()">Start Demo (30 Requests)</button>
+    <button onclick="clearResults()">Clear Results</button>
+
+    <div class="stats">
+        <div class="stat-box" id="instance1">
+            <h3>Instance 1</h3>
+            <p>Requests: <span id="count1">0</span></p>
+            <p>Percentage: <span id="percent1">0%</span></p>
+        </div>
+        <div class="stat-box" id="instance2">
+            <h3>Instance 2</h3>
+            <p>Requests: <span id="count2">0</span></p>
+            <p>Percentage: <span id="percent2">0%</span></p>
+        </div>
+        <div class="stat-box" id="instance3">
+            <h3>Instance 3</h3>
+            <p>Requests: <span id="count3">0</span></p>
+            <p>Percentage: <span id="percent3">0%</span></p>
+        </div>
+    </div>
+
+    <h3>Real-time Request Log:</h3>
+    <div class="request-log" id="requestLog"></div>
+
+    <script>
+        let totalRequests = 0;
+        const instanceCounts = {1: 0, 2: 0, 3: 0};
+
+        function updateStats() {
+            Object.keys(instanceCounts).forEach(instance => {
+                const count = instanceCounts[instance];
+                const percentage = totalRequests > 0 ? ((count / totalRequests) * 100).toFixed(1) : 0;
+                document.getElementById(`count${instance}`).textContent = count;
+                document.getElementById(`percent${instance}`).textContent = `${percentage}%`;
+            });
+        }
+
+        function addLogEntry(instanceId, timestamp) {
+            const log = document.getElementById('requestLog');
+            const entry = document.createElement('div');
+            entry.className = 'request-entry';
+            entry.style.backgroundColor = 
+                instanceId === '1' ? '#ffebee' : 
+                instanceId === '2' ? '#e8f5e9' : '#e3f2fd';
+            entry.textContent = `Instance ${instanceId} handled request at ${new Date(timestamp).toLocaleTimeString()}`;
+            log.insertBefore(entry, log.firstChild);
+        }
+
+        function highlightInstance(instanceId) {
+            // Remove active class from all instances
+            document.querySelectorAll('.stat-box').forEach(box => box.classList.remove('active'));
+            // Add active class to the instance that handled the request
+            document.getElementById(`instance${instanceId}`).classList.add('active');
+            // Remove active class after animation
+            setTimeout(() => {
+                document.getElementById(`instance${instanceId}`).classList.remove('active');
+            }, 500);
+        }
+
+        function makeRequest() {
+            fetch('/instance-check')
+                .then(response => response.json())
+                .then(data => {
+                    const instanceId = data.instanceId;
+                    instanceCounts[instanceId]++;
+                    totalRequests++;
+                    updateStats();
+                    addLogEntry(instanceId, data.timestamp);
+                    highlightInstance(instanceId);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function startDemo() {
+            // Make 30 requests with 100ms delay between each
+            for (let i = 0; i < 30; i++) {
+                setTimeout(makeRequest, i * 100);
+            }
+        }
+
+        function clearResults() {
+            totalRequests = 0;
+            Object.keys(instanceCounts).forEach(key => instanceCounts[key] = 0);
+            updateStats();
+            document.getElementById('requestLog').innerHTML = '';
+        }
+    </script>
+</body>
+</html> 
