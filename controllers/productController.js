@@ -2,11 +2,6 @@ const Product = require("../models/productModel");
 
 exports.getAllProducts = async (req, res) => {
   try {
-    // Check if user is logged in
-    // if(!req.session.user) {
-    //   res.redirect('/auth');
-    // }
-
     console.log("Attempting to fetch products...");
 
     let filter = {};
@@ -15,24 +10,37 @@ exports.getAllProducts = async (req, res) => {
     // Lọc theo loại sản phẩm (nếu có)
     if (req.query.type) {
       filter.type = req.query.type;
-      console.log("Filtering products by type:", req.query.type);
     }
 
-    // Sắp xếp theo giá (nếu có)
-    if (req.query.sort === "asc") {
-      sortOption.price = 1; // Sắp xếp giá tăng dần
-    } else if (req.query.sort === "desc") {
-      sortOption.price = -1; // Sắp xếp giá giảm dần
+    // Sort by first variant's price
+    if (req.query.sort) {
+      if (req.query.sort === "asc") {
+        // Sort by the first variant's price in ascending order
+        products = await Product.aggregate([
+          {
+            $addFields: {
+              firstVariantPrice: { $arrayElemAt: ["$variants.price", 0] }
+            }
+          },
+          { $sort: { firstVariantPrice: 1 } }
+        ]);
+      } else if (req.query.sort === "desc") {
+        // Sort by the first variant's price in descending order
+        products = await Product.aggregate([
+          {
+            $addFields: {
+              firstVariantPrice: { $arrayElemAt: ["$variants.price", 0] }
+            }
+          },
+          { $sort: { firstVariantPrice: -1 } }
+        ]);
+      }
+    } else {
+      // No sorting, just fetch products
+      products = await Product.find(filter);
     }
-
-    // Truy vấn sản phẩm với filter và sort
-    const products = await Product.find(filter).sort(sortOption);
 
     console.log("Products fetched:", products.length);
-
-    if (products.length === 0) {
-      console.log("No products found in database");
-    }
 
     res.render("index", { products, user: req.session.user });
   } catch (error) {

@@ -42,7 +42,7 @@ services:
   app1:
     build: .
     environment:
-      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/products
+      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/computer-ecommerce-website
       - SESSION_SECRET=secret
       - INSTANCE_ID=1
       - REDIS_HOST=redis
@@ -60,7 +60,7 @@ services:
   app2:
     build: .
     environment:
-      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/products
+      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/computer-ecommerce-website
       - SESSION_SECRET=secret
       - INSTANCE_ID=2
       - REDIS_HOST=redis
@@ -78,7 +78,7 @@ services:
   app3:
     build: .
     environment:
-      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/products
+      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/computer-ecommerce-website
       - SESSION_SECRET=secret
       - INSTANCE_ID=3
       - REDIS_HOST=redis
@@ -99,7 +99,7 @@ services:
       dockerfile: Dockerfile
     command: node worker.js
     environment:
-      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/products
+      - MONGO_URI=mongodb+srv://jabick10:Baole2004@projectnodejs.7x9uw.mongodb.net/computer-ecommerce-website
       - INSTANCE_ID=worker
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=admin
@@ -112,4 +112,4 @@ services:
 
 volumes:
   redis_data:
-  rabbitmq_data: 
+  rabbitmq_data:
