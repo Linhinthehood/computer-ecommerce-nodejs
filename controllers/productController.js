@@ -66,58 +66,10 @@ exports.getProductByID = async (req, res) => {
   }
 };
 
-exports.getShirts = async (req, res) => {
-  try {
-    console.log("Fetching only shirts...");
-
-    let sortOption = {};
-    if (req.query.sort === "asc") {
-      sortOption.price = 1;
-    } else if (req.query.sort === "desc") {
-      sortOption.price = -1;
-    }
-
-    const products = await Product.find({ type: "Shirts" }).sort(sortOption);
-
-    console.log("Shirts found:", products.length);
-
-    if (products.length === 0) {
-      console.log("No shirts found in database");
-    }
-
-    res.render("shirts", { products, user: req.session.user });
-  } catch (error) {
-    console.error("Error in getShirts:", error);
-    res.status(500).json({ message: "Server error", error: error.toString() });
-  }
-};
 
 
-exports.getBottoms = async (req, res) => {
-  try {
-    console.log("Fetching only Bottoms...");
 
-    let sortOption = {};
-    if (req.query.sort === "asc") {
-      sortOption.price = 1; // Sắp xếp giá tăng dần
-    } else if (req.query.sort === "desc") {
-      sortOption.price = -1; // Sắp xếp giá giảm dần
-    }
 
-    const products = await Product.find({ type: "Bottoms" }).sort(sortOption);
-
-    console.log("Bottoms found:", products.length);
-
-    if (products.length === 0) {
-      console.log("No Bottoms found in database");
-    }
-
-    res.render("bottoms", { products, user: req.session.user }); // Đảm bảo render đúng file `bottoms.ejs`
-  } catch (error) {
-    console.error("Error in getBottoms:", error);
-    res.status(500).json({ message: "Server error", error: error.toString() });
-  }
-};
 
 
 exports.searchProducts = async (req, res) => {
@@ -148,54 +100,135 @@ exports.searchProducts = async (req, res) => {
 };
 
 
-exports.getAccessories = async (req, res) => {
+
+
+
+exports.getLaptops = async (req, res) => {
   try {
-    console.log("Fetching only accessories...");
+    console.log("Fetching only laptops...");
 
     let sortOption = {};
     if (req.query.sort === "asc") {
-      sortOption.price = 1; // Sắp xếp giá tăng dần
+      sortOption = { "variants.0.price": 1 }; // Sort by first variant's price ascending
     } else if (req.query.sort === "desc") {
-      sortOption.price = -1; // Sắp xếp giá giảm dần
+      sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
     }
 
-    const products = await Product.find({ type: "Accessories" }).sort(sortOption);
+    const products = await Product.find({ category: "Laptop" }).sort(sortOption);
 
-    console.log("Accessories found:", products.length);
+    console.log("Laptops found:", products.length);
 
     if (products.length === 0) {
-      console.log("No Accessories found in database");
+      console.log("No laptops found in database");
     }
 
-    res.render("accessories", { products, user: req.session.user }); // Đảm bảo render đúng file `accessories.ejs`
+    res.render("laptop", { products, user: req.session.user });
   } catch (error) {
-    console.error("Error in getAccessories:", error);
+    console.error("Error in getLaptops:", error);
     res.status(500).json({ message: "Server error", error: error.toString() });
   }
 };
 
-exports.getOuterwears = async (req, res) => {
+exports.getRAMs = async (req, res) => {
   try {
-    console.log("Fetching only Outerwears...");
+    console.log("Fetching only RAMs...");
 
     let sortOption = {};
     if (req.query.sort === "asc") {
-      sortOption.price = 1; // Sắp xếp giá tăng dần
+      sortOption = { "variants.0.price": 1 }; // Sort by first variant's price ascending
     } else if (req.query.sort === "desc") {
-      sortOption.price = -1; // Sắp xếp giá giảm dần
+      sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
     }
 
-    const products = await Product.find({ type: "Outerwears" }).sort(sortOption);
+    const products = await Product.find({ category: "RAM" }).sort(sortOption);
 
-    console.log("Outerwears found:", products.length);
+    console.log("RAMs found:", products.length);
 
     if (products.length === 0) {
-      console.log("No Outerwears found in database");
+      console.log("No RAMs found in database");
     }
 
-    res.render("outerwears", { products, user: req.session.user }); // Đảm bảo render đúng file `outerwears.ejs`
+    res.render("ram", { products, user: req.session.user });
   } catch (error) {
-    console.error("Error in getOuterwears:", error);
+    console.error("Error in getRAMs:", error);
+    res.status(500).json({ message: "Server error", error: error.toString() });
+  }
+};
+
+exports.getCPUs = async (req, res) => {
+  try {
+    console.log("Fetching only CPUs...");
+
+    let sortOption = {};
+    if (req.query.sort === "asc") {
+      sortOption = { "variants.0.price": 1 }; // Sort by first variant's price ascending
+    } else if (req.query.sort === "desc") {
+      sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
+    }
+
+    const products = await Product.find({ category: "CPU" }).sort(sortOption);
+
+    console.log("CPUs found:", products.length);
+
+    if (products.length === 0) {
+      console.log("No CPUs found in database");
+    }
+
+    res.render("cpu", { products, user: req.session.user });
+  } catch (error) {
+    console.error("Error in getCPUs:", error);
+    res.status(500).json({ message: "Server error", error: error.toString() });
+  }
+};
+
+exports.getSSDs = async (req, res) => {
+  try {
+    console.log("Fetching only SSDs...");
+
+    let sortOption = {};
+    if (req.query.sort === "asc") {
+      sortOption = { "variants.0.price": 1 }; // Sort by first variant's price ascending
+    } else if (req.query.sort === "desc") {
+      sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
+    }
+
+    const products = await Product.find({ category: "SSD" }).sort(sortOption);
+
+    console.log("SSDs found:", products.length);
+
+    if (products.length === 0) {
+      console.log("No SSDs found in database");
+    }
+
+    res.render("ssd", { products, user: req.session.user });
+  } catch (error) {
+    console.error("Error in getSSDs:", error);
+    res.status(500).json({ message: "Server error", error: error.toString() });
+  }
+};
+
+exports.getHDDs = async (req, res) => {
+  try {
+    console.log("Fetching only HDDs...");
+
+    let sortOption = {};
+    if (req.query.sort === "asc") {
+      sortOption = { "variants.0.price": 1 }; // Sort by first variant's price ascending
+    } else if (req.query.sort === "desc") {
+      sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
+    }
+
+    const products = await Product.find({ category: "HDD" }).sort(sortOption);
+
+    console.log("HDDs found:", products.length);
+
+    if (products.length === 0) {
+      console.log("No HDDs found in database");
+    }
+
+    res.render("hdd", { products, user: req.session.user });
+  } catch (error) {
+    console.error("Error in getHDDs:", error);
     res.status(500).json({ message: "Server error", error: error.toString() });
   }
 };
@@ -246,5 +279,4 @@ exports.getCheckout = (req, res) => {
     return res.redirect('/auth');
   }
   const cart = req.session.cart || [];
-  res.render('checkout', { cart, user: req.session.user });
-};
+  res.render('checkout', { cart, user: req.session.user });};

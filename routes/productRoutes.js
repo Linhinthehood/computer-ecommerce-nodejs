@@ -8,13 +8,16 @@ router.get("/", productController.getAllProducts);
 
 router.get("/product/:id", productController.getProductByID)
 
-router.get("/shirts", productController.getShirts);
+router.get("/laptop", productController.getLaptops);
 
-router.get("/bottoms", productController.getBottoms);
+router.get("/ram", productController.getRAMs);
 
-router.get("/accessories",productController.getAccessories)
+router.get("/cpu",productController.getCPUs)
 
-router.get("/outerwears",productController.getOuterwears)
+
+router.get("/ssd",productController.getSSDs)
+router.get("/hdd",productController.getHDDs)
+
 
 
 router.get("/search", productController.searchProducts);

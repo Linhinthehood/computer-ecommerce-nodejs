@@ -142,17 +142,20 @@ app.use('/', authRoutes);
 const productRoutes = require('./routes/productRoutes');
 app.use('/', productRoutes);
 
-const shirts_page = require('./routes/shirtsRoutes');
-app.use('/', shirts_page);
+const laptop_page = require('./routes/laptopRoutes');
+app.use('/', laptop_page);
 
-const bottoms_page = require('./routes/bottomsRoutes');
-app.use('/', bottoms_page);
+const ram_page = require('./routes/ramRoutes');
+app.use('/', ram_page);
 
-const outerwears_page = require('./routes/outerwearRoutes');
-app.use('/', outerwears_page);
+const cpu_page = require('./routes/cpu');
+app.use('/', cpu_page);
 
-const accessories_page = require('./routes/accessoriesRoutes');
-app.use('/', accessories_page);
+const ssd_page = require('./routes/ssdRoutes');
+app.use('/', ssd_page);
+
+const hdd_page = require('./routes/hddRoutes');
+app.use('/', hdd_page);
 
 const aboutus_page = require('./routes/aboutusRouters');
 app.use('/', aboutus_page);
