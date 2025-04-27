@@ -4,8 +4,8 @@
  */
 
 /**
- * Send a welcome email to a new user
- * @param {Object} user - The user object containing name and email
+ * Send a welcome email to a new user with their temporary password
+ * @param {Object} user - The user object containing name, email and temporary password
  * @returns {Promise<boolean>} - Whether the email was sent successfully
  */
 async function sendWelcomeEmail(user) {
@@ -13,11 +13,20 @@ async function sendWelcomeEmail(user) {
     console.log(`
       ==== MOCK EMAIL SENT ====
       To: ${user.email}
-      Subject: Welcome to Our Store, ${user.name}!
+      Subject: Welcome to Our Store - Your Account Information
       
       Dear ${user.name},
       
-      Thank you for joining Our Store! We're excited to have you on board.
+      Thank you for creating an account with Our Store! 
+      
+      Here are your account details:
+      - Email: ${user.email}
+      - Temporary Password: ${user.password}
+      
+      For security reasons, please change your password when you first log in.
+      You can do this by going to your Profile Settings after logging in.
+      
+      If you didn't create this account, please contact our support team immediately.
       
       Best regards,
       The Store Team
@@ -30,6 +39,43 @@ async function sendWelcomeEmail(user) {
     return true;
   } catch (error) {
     console.error('Error sending welcome email:', error.message);
+    return false;
+  }
+}
+
+/**
+ * Send a password reset email
+ * @param {Object} data - Contains user email and reset token/password
+ * @returns {Promise<boolean>} - Whether the email was sent successfully
+ */
+async function sendPasswordResetEmail(data) {
+  try {
+    console.log(`
+      ==== MOCK EMAIL SENT ====
+      To: ${data.email}
+      Subject: Password Reset - Our Store
+      
+      Dear Customer,
+      
+      Your password has been reset successfully.
+      
+      Your new temporary password is: ${data.password}
+      
+      Please change this password after logging in for security purposes.
+      
+      If you didn't request this password reset, please contact our support team immediately.
+      
+      Best regards,
+      The Store Team
+      ==== END OF MOCK EMAIL ====
+    `);
+    
+    // Simulate async process
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return true;
+  } catch (error) {
+    console.error('Error sending password reset email:', error.message);
     return false;
   }
 }
@@ -76,5 +122,6 @@ async function sendOrderConfirmationEmail(orderData) {
 
 module.exports = {
   sendWelcomeEmail,
+  sendPasswordResetEmail,
   sendOrderConfirmationEmail
 }; 

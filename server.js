@@ -5,6 +5,7 @@ const path = require('path');
 const session = require('express-session');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const flash = require('connect-flash');
 
 // Load env variables first
 dotenv.config();
@@ -71,6 +72,15 @@ if (process.env.REDIS_HOST && isDocker) {
 
 // Configure session middleware
 app.use(session(sessionConfig));
+
+// Configure flash messages
+app.use(flash());
+
+// Add flash messages to all responses
+app.use((req, res, next) => {
+    res.locals.messages = req.flash();
+    next();
+});
 
 // Kết nối tới MongoDB
 connectDB();

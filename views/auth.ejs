@@ -41,6 +41,27 @@
     .form-label {
       font-weight: 500;
     }
+
+    .address-section {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .address-section h6 {
+      margin-bottom: 15px;
+      color: #495057;
+    }
+
+    .form-text {
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+
+    .alert {
+      border-radius: 8px;
+    }
   </style>
 </head>
 
@@ -50,11 +71,13 @@
 
   <div style="margin: 80px 0px 30px 0px;">
     <!-- Đoạn hiển thị alert lỗi nếu có -->
-        <!-- MAIN CONTENT -->
-        <main class="container flex-grow-1">
-          <div class="row w-100">
-            <!-- Đăng nhập (Login) - Bên trái -->
-            <div class="col-12 col-md-6 mb-5 mb-md-0">
+    <!-- MAIN CONTENT -->
+    <main class="container flex-grow-1">
+      <div class="row w-100">
+        <!-- Đăng nhập (Login) - Bên trái -->
+        <div class="col-12 col-md-6 mb-5 mb-md-0">
+          <div class="card shadow-sm">
+            <div class="card-body">
               <h3 class="mb-4 text-center">Login</h3>
               <hr>
               <form action="/login" method="POST" class="auth-form">
@@ -65,6 +88,7 @@
                 <div class="mb-3">
                   <label for="loginPassword" class="form-label">Password</label>
                   <input type="password" class="form-control" id="loginPassword" name="password" required />
+                  <div class="form-text">Enter the password sent to your email.</div>
                 </div>
                 <% if (loginError) { %>
                   <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
@@ -78,41 +102,72 @@
                 <button type="submit" class="btn btn-primary w-100">Login</button>
               </form>
             </div>
+          </div>
+        </div>
 
-
-
-            <!-- Đăng ký (Sign Up) - Bên phải -->
-            <div class="col-12 col-md-6">
+        <!-- Đăng ký (Sign Up) - Bên phải -->
+        <div class="col-12 col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
               <h3 class="mb-4 text-center">Sign Up</h3>
               <hr>
               <form action="/register" method="POST" class="auth-form">
-                <div class="mb-3">
-                  <label for="registerName" class="form-label">Name</label>
-                  <input type="text" class="form-control" id="registerName" name="name" value="<%= formData.name || '' %>" required />
+                <!-- Personal Information -->
+                <div class="mb-4">
+                  <h6 class="text-muted">Personal Information</h6>
+                  <div class="mb-3">
+                    <label for="registerName" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="registerName" name="name" value="<%= formData.name || '' %>" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="registerEmail" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="registerEmail" name="email" value="<%= formData.email || '' %>" required />
+                    <div class="form-text">Your password will be sent to this email.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="registerPhone" class="form-label">Phone number</label>
+                    <input type="tel" class="form-control" id="registerPhone" name="phone" value="<%= formData.phone || '' %>" required />
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="registerEmail" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="registerEmail" name="email" value="<%= formData.email || '' %>" required />
+
+                <!-- Shipping Address -->
+                <div class="address-section">
+                  <h6 class="mb-3">Shipping Address</h6>
+                  <div class="mb-3">
+                    <label for="street" class="form-label">Street Address</label>
+                    <input type="text" class="form-control" id="street" name="shippingAddress[street]" value="<%= formData.street || '' %>" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="ward" class="form-label">Ward</label>
+                    <input type="text" class="form-control" id="ward" name="shippingAddress[ward]" value="<%= formData.ward || '' %>" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="district" class="form-label">District</label>
+                    <input type="text" class="form-control" id="district" name="shippingAddress[district]" value="<%= formData.district || '' %>" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="shippingAddress[city]" value="<%= formData.city || '' %>" required />
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="registerPassword" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="registerPassword" name="password" required />
-                </div>
-                <div class="mb-3">
-                  <label for="registerPhone" class="form-label">Phone number</label>
-                  <input type="text" class="form-control" id="registerPhone" name="phone" value="<%= formData.phone || '' %>" />
-                </div>
+
                 <% if (signupError) { %>
                   <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
                     <%= signupError %>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
                 <% } %>
-                <button type="submit" class="btn btn-success w-100">Sign Up</button>
+
+                <button type="submit" class="btn btn-success w-100">Create Account</button>
+                <div class="form-text text-center mt-2">
+                  By creating an account, you will receive your password via email.
+                </div>
               </form>
             </div>
           </div>
-        </main>
+        </div>
+      </div>
+    </main>
   </div>
   
   <!-- Footer -->

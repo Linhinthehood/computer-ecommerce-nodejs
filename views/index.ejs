@@ -77,11 +77,36 @@
     .star-rating {
         color: #ffc107;
     }
+
+    /* Flash message styles */
+    .flash-message {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1050;
+        max-width: 350px;
+    }
+
+    .flash-message .alert {
+        margin-bottom: 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
 </style>
 
 <body>
     <!-- Navbar -->
     <%- include('partials/navbar') %>
+    
+    <!-- Flash Messages -->
+    <% if (messages.success) { %>
+        <div class="flash-message">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= messages.success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    <% } %>
+
     <!-- Carousel -->
     <%- include('partials/carousel') %>
 

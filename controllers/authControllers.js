@@ -2,13 +2,28 @@
 
 const User = require('../models/userModel');
 const messageService = require('../services/messageService');
+const emailService = require('../services/emailService');
 const { QUEUES } = require('../config/rabbitmq');
 const bcrypt = require('bcrypt');
-// const Product = require('../models/productModel');
+
+/**
+ * Generate a random password
+ * @returns {string} Random password
+ */
+const generateRandomPassword = () => {
+  const length = 10;
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset[randomIndex];
+  }
+  return password;
+};
 
 /**
  * GET /auth
- * Render trang đăng nhập / đăng ký
+ * Render login/registration page
  */
 exports.getAuthPage = (req, res) => {
   // Tên file view: auth.ejs
@@ -16,149 +31,209 @@ exports.getAuthPage = (req, res) => {
     user: req.session.user || null, // Thêm user từ session
     loginError: null,
     signupError: null,
-    formData: {} // To preserve form data on error
+    formData: {}, // To preserve form data on error
+    messages: req.flash()
   });
 };
 
 /**
  * POST /register
- * Xử lý đăng ký
+ * Handle registration
  */
 exports.postRegister = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
-    // let products = await Product.find();
+    const { 
+      name, 
+      email, 
+      phone,
+      shippingAddress
+    } = req.body;
 
-    // Kiểm tra email đã tồn tại?
-    const existingUser = await User.findOne({ email });
+    // Check if email exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
+      if (req.headers['content-type'] === 'application/json') {
+        return res.status(400).json({ error: 'Email already registered.' });
+      }
       return res.render('auth', { 
-        user: req.session.user || null, // Thêm user từ session
+        user: req.session.user || null,
         loginError: null,
         signupError: 'Email already registered.',
-        formData: req.body // Preserve the form data
+        formData: req.body,
+        messages: {}
       });
     }
 
-    // Validate password
-    if (password.length < 6) {
-      return res.render('auth', {
-        user: req.session.user || null, // Thêm user từ session
-        loginError: null,
-        signupError: 'Password must be at least 6 characters long.',
-        formData: req.body
-      });
-    }
-
-    // Validate phone (if provided)
-    if (phone) {
-      const cleanPhone = phone.replace(/[- ]/g, '');
-      const phoneRegex = /^\d{10,15}$/;
-      if (!phoneRegex.test(cleanPhone)) {
-        return res.render('auth', {
-          user: req.session.user || null, // Thêm user từ session
-          loginError: null,
-          signupError: 'Phone number must be between 10 and 15 digits.',
-          formData: req.body
-        });
+    // Validate phone
+    const cleanPhone = phone.replace(/[- ]/g, '');
+    const phoneRegex = /^\d{10,15}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      if (req.headers['content-type'] === 'application/json') {
+        return res.status(400).json({ error: 'Phone number must be between 10 and 15 digits.' });
       }
+      return res.render('auth', {
+        user: req.session.user || null,
+        loginError: null,
+        signupError: 'Phone number must be between 10 and 15 digits.',
+        formData: req.body,
+        messages: {}
+      });
     }
 
-    // Hash the password
+    // Generate random password
+    const randomPassword = generateRandomPassword();
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(randomPassword, saltRounds);
 
-    // Tạo user mới với mật khẩu đã hash
-    const newUser = new User({ name, email, password: hashedPassword, phone });
+    // Create new user
+    const newUser = new User({
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      phone: cleanPhone,
+      shippingAddress,
+      isFirstLogin: true,
+      passwordChangeRequired: true
+    });
+
     await newUser.save();
     console.log("New user created:", newUser);
 
-    // Queue welcome email asynchronously
-    await messageService.publishMessage(QUEUES.WELCOME_EMAIL, {
+    // Send welcome email with password
+    await emailService.sendWelcomeEmail({
       name,
-      email,
-      userId: newUser._id
+      email: email.toLowerCase(),
+      password: randomPassword
     });
 
-    // Lưu thông tin user vào session để tự động đăng nhập
+    // Set session
     req.session.user = {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
-      phone: newUser.phone
+      phone: newUser.phone,
+      shippingAddress: newUser.shippingAddress,
+      isFirstLogin: true,
+      passwordChangeRequired: true
     };
-    console.log("User logged in:", req.session.user);
 
-    // Chuyển hướng về trang chủ
-    return res.redirect("/");
+    if (req.headers['content-type'] === 'application/json') {
+      return res.status(201).json({
+        message: 'Registration successful. Please check your email for login credentials.',
+        user: {
+          id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          phone: newUser.phone,
+          shippingAddress: newUser.shippingAddress
+        }
+      });
+    }
+
+    // Set flash message and redirect to home
+    req.flash('success', 'Registration successful! Please check your email for your password.');
+    return res.redirect('/');
+
   } catch (err) {
     console.error(err);
+    if (req.headers['content-type'] === 'application/json') {
+      return res.status(500).json({ error: 'Registration failed. Please try again.' });
+    }
     return res.render('auth', { 
-      user: req.session.user || null, // Thêm user từ session
+      user: req.session.user || null,
       loginError: null,
-      signupError: 'Server error. Please try again later.',
-      formData: req.body
+      signupError: 'Registration failed. Please try again.',
+      formData: req.body,
+      messages: {}
     });
   }
 };
 
 /**
  * POST /login
- * Xử lý đăng nhập
+ * Handle login
  */
 exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Tìm user theo email
-    const user = await User.findOne({ email });
+    // Find user
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
+      if (req.headers['content-type'] === 'application/json') {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
       return res.render('auth', { 
-        user: req.session.user || null, // Thêm user từ session
-        loginError: 'User not found.',
+        user: req.session.user || null,
+        loginError: 'Invalid email or password.',
         signupError: null,
         formData: req.body
       });
     }
 
-    // Check if password is hashed (starts with $2a$ or $2b$ for bcrypt)
-    if (!user.password.startsWith('$2')) {
-      return res.render('auth', { 
-        user: req.session.user || null, // Thêm user từ session
-        loginError: 'Your account needs to be updated. Please register again.',
-        signupError: null,
-        formData: req.body
-      });
-    }
-
-    // Verify password using bcrypt
+    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      if (req.headers['content-type'] === 'application/json') {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
       return res.render('auth', { 
-        user: req.session.user || null, // Thêm user từ session
-        loginError: 'Invalid password.',
+        user: req.session.user || null,
+        loginError: 'Invalid email or password.',
         signupError: null,
         formData: req.body
       });
     }
 
-    // Nếu đúng => đăng nhập thành công
-    // Lưu thông tin đăng nhập vào session
+    // Set session
     req.session.user = {
       id: user._id,
       name: user.name,
       email: user.email,
-      phone: user.phone
+      phone: user.phone,
+      shippingAddress: user.shippingAddress,
+      isFirstLogin: user.isFirstLogin,
+      passwordChangeRequired: user.passwordChangeRequired
     };
-    console.log("User logged in:", req.session.user);
 
-    // Tùy ý: tạo session, JWT, v.v.
+    // Check if password change is required
+    if (user.passwordChangeRequired) {
+      if (req.headers['content-type'] === 'application/json') {
+        return res.status(200).json({
+          message: 'Login successful but password change required',
+          requirePasswordChange: true,
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email
+          }
+        });
+      }
+      return res.redirect("/profile/change-password?required=true");
+    }
+
+    if (req.headers['content-type'] === 'application/json') {
+      return res.status(200).json({
+        message: 'Login successful',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          shippingAddress: user.shippingAddress
+        }
+      });
+    }
+
     return res.redirect("/");
   } catch (err) {
     console.error(err);
+    if (req.headers['content-type'] === 'application/json') {
+      return res.status(500).json({ error: 'Login failed. Please try again.' });
+    }
     return res.render('auth', { 
-      user: req.session.user || null, // Thêm user từ session
-      loginError: 'Server error. Please try again later.',
+      user: req.session.user || null,
+      loginError: 'Login failed. Please try again.',
       signupError: null,
       formData: req.body
     });
