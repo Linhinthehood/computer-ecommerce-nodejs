@@ -13,6 +13,7 @@ const bcrypt = require('bcrypt');
 exports.getAuthPage = (req, res) => {
   // Tên file view: auth.ejs
   res.render('auth', { 
+    user: req.session.user || null, // Thêm user từ session
     loginError: null,
     signupError: null,
     formData: {} // To preserve form data on error
@@ -32,6 +33,7 @@ exports.postRegister = async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.render('auth', { 
+        user: req.session.user || null, // Thêm user từ session
         loginError: null,
         signupError: 'Email already registered.',
         formData: req.body // Preserve the form data
@@ -41,6 +43,7 @@ exports.postRegister = async (req, res) => {
     // Validate password
     if (password.length < 6) {
       return res.render('auth', {
+        user: req.session.user || null, // Thêm user từ session
         loginError: null,
         signupError: 'Password must be at least 6 characters long.',
         formData: req.body
@@ -53,6 +56,7 @@ exports.postRegister = async (req, res) => {
       const phoneRegex = /^\d{10,15}$/;
       if (!phoneRegex.test(cleanPhone)) {
         return res.render('auth', {
+          user: req.session.user || null, // Thêm user từ session
           loginError: null,
           signupError: 'Phone number must be between 10 and 15 digits.',
           formData: req.body
@@ -90,6 +94,7 @@ exports.postRegister = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.render('auth', { 
+      user: req.session.user || null, // Thêm user từ session
       loginError: null,
       signupError: 'Server error. Please try again later.',
       formData: req.body
@@ -109,6 +114,7 @@ exports.postLogin = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.render('auth', { 
+        user: req.session.user || null, // Thêm user từ session
         loginError: 'User not found.',
         signupError: null,
         formData: req.body
@@ -118,6 +124,7 @@ exports.postLogin = async (req, res) => {
     // Check if password is hashed (starts with $2a$ or $2b$ for bcrypt)
     if (!user.password.startsWith('$2')) {
       return res.render('auth', { 
+        user: req.session.user || null, // Thêm user từ session
         loginError: 'Your account needs to be updated. Please register again.',
         signupError: null,
         formData: req.body
@@ -128,6 +135,7 @@ exports.postLogin = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.render('auth', { 
+        user: req.session.user || null, // Thêm user từ session
         loginError: 'Invalid password.',
         signupError: null,
         formData: req.body
@@ -149,6 +157,7 @@ exports.postLogin = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.render('auth', { 
+      user: req.session.user || null, // Thêm user từ session
       loginError: 'Server error. Please try again later.',
       signupError: null,
       formData: req.body

@@ -72,69 +72,9 @@
 </style>
 
 <body>
-    <!--cái này là phần Navigation-->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-uppercase" href="/">We Sell Clothes</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/">All Products</a></li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
-                            <li><a class="dropdown-item" href="/">New Arrivals</a></li>
-                            <li><a class="dropdown-item" href="/shirts">Shirts</a></li>
-                            <li><a class="dropdown-item" href="/bottoms">Bottoms</a></li>
-                            <li><a class="dropdown-item" href="/outerwears">Outerwears</a></li>
-                            <li><a class="dropdown-item" href="/accessories">Accessories</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="/aboutus">About</a></li>
-                </ul>
+    <!-- Navbar -->
+    <%- include('partials/navbar') %>
 
-                <!-- Phần search -->
-                <form class="d-flex me-3" action="/search" method="GET">
-                    <input class="form-control form-control-sm border-dark" type="search" name="query" placeholder="Search"
-                        aria-label="Search" required>
-                    <button class="btn btn-dark btn-sm ms-2" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-
-                <!-- Phần giỏ hàng và đăng nhập -->
-                <div class="d-flex align-items-center gap-3">
-                    <% if (user) { %>
-                        <div class="dropdown">
-                            <a href="#" class="text-dark fw-bold text-uppercase small dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
-                                <%= user.name %>  <i class="bi bi-person-fill fs-4"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                            </ul>
-                        </div>
-                    <% } else { %>
-                        <a href="/auth" class="text-dark fw-bold text-uppercase small">
-                            Login / Register <i class="bi bi-person-fill fs-4"></i>
-                        </a>
-                    <% } %>
-                    <button id="cartButton" class="btn btn-dark btn-sm ms-2">
-                        <i class="bi bi-cart-fill me-1"></i>
-                        <span id="cartCount" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
     <!-- Modal giỏ hàng -->
     <div id="cartModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog">
@@ -295,67 +235,9 @@
         </div>
         </div>
     </main>
+
     <!-- FOOTER -->
-    <footer class="bg-dark text-light py-5 mt-auto ">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-3 fw-bold">We Sell Clothes</h5>
-                    <p>Quality clothing for everyday wear. Our products are designed with comfort and style in mind.</p>
-                    <div class="d-flex gap-3 mt-3">
-                        <a href="#" class="text-light"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-pinterest"></i></a>
-                    </div>
-                </div>
-                <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-3">SHOP</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Tops</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Bottoms</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Outerwears</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Accessories</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">New Arrivals</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-3">CUSTOMER CARE</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">FAQs</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Returns & Exchanges</a>
-                        </li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Shipping Info</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Size Guide</a></li>
-                    </ul>
-                </div>
-                <div class="col-12 col-md-4">
-                    <h6 class="fw-bold mb-3">NEWSLETTER</h6>
-                    <p>Subscribe to receive updates, access to exclusive deals, and more.</p>
-                    <div class="input-group mb-3">
-                        <input type="email" class="form-control" placeholder="Your email address" aria-label="Email">
-                        <button class="btn btn-primary" type="button">Subscribe</button>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="fw-bold mb-2">WE ACCEPT</h6>
-                        <div class="d-flex gap-2">
-                            <i class="fab fa-cc-visa fa-2x"></i>
-                            <i class="fab fa-cc-mastercard fa-2x"></i>
-                            <i class="fab fa-cc-amex fa-2x"></i>
-                            <i class="fab fa-cc-paypal fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <hr class="mt-4 border-secondary">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="mb-0">&copy; 2025 TDTU. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <%- include('partials/footer') %>
 
     <style>
         footer a:hover {

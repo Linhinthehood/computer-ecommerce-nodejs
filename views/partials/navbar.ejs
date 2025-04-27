@@ -1,0 +1,111 @@
+<!--Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-uppercase" href="/">We Sell Computer</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/">All Products</a></li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li><a class="dropdown-item" href="/">New Arrivals</a></li>
+                        <li><a class="dropdown-item" href="/laptop">LAPTOP</a></li>
+                        <li><a class="dropdown-item" href="/ram">RAM</a></li>
+                        <li><a class="dropdown-item" href="/cpu">CPU</a></li>
+                        <li><a class="dropdown-item" href="/ssd">SSD</a></li>
+                        <li><a class="dropdown-item" href="/hdd">HDD</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/aboutus">About</a></li>
+            </ul>
+
+            <!-- Search -->
+            <form class="d-flex me-3" action="/search" method="GET">
+                <input class="form-control form-control-sm border-dark" type="search" name="query"
+                    placeholder="Search" aria-label="Search" required>
+                <button class="btn btn-dark btn-sm ms-2" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+
+            <!-- Login and Cart -->
+            <div class="d-flex align-items-center gap-3">
+                <% if (user) { %>
+                    <div class="dropdown">
+                        <a href="#" class="text-dark fw-bold text-uppercase small dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false" style="text-decoration: none;">
+                            <%= user.name %> <i class="bi bi-person-fill fs-4"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                <% } else { %>
+                    <a href="/auth" class="text-dark fw-bold text-uppercase small">
+                        Login / Register <i class="bi bi-person-fill fs-4"></i>
+                    </a>
+                <% } %>
+                <button id="cartButton" class="btn btn-dark btn-sm ms-2">
+                    <i class="bi bi-cart-fill me-1"></i>
+                    <span id="cartCount" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Cart Modal -->
+<div id="cartModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Giỏ hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="cartItems" class="list-group"></ul>
+            </div>
+            <div class="modal-footer">
+                <button id="clearCart" class="btn btn-danger me-auto">Xóa tất cả</button>
+                <a href="/cart" class="btn btn-primary">Go to Cart</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .navbar {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .navbar.fixed-top {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .form-control:focus {
+        border-color: #f04e30;
+        box-shadow: 0 0 5px rgba(240, 78, 48, 0.5);
+    }
+
+    .btn-dark:hover {
+        background-color: #f04e30;
+        border-color: #f04e30;
+    }
+
+    .text-dark:hover {
+        color: #f04e30 !important;
+    }
+</style> 
