@@ -60,15 +60,22 @@
         color: white;
     }
 
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-    }
-
     .main-container {
         max-width: 1200px;
         margin: 30px auto;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+    }
+
+    .star-rating {
+        color: #ffc107;
     }
 </style>
 
@@ -96,32 +103,6 @@
             </div>
         </div>
     </div>
-
-    <!-- CSS cho cái navigation -->
-    <style>
-        .navbar {
-            transition: all 0.3s ease-in-out;
-        }
-
-        .navbar.fixed-top {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: rgba(255, 255, 255, 0.95);
-        }
-
-        .form-control:focus {
-            border-color: #f04e30;
-            box-shadow: 0 0 5px rgba(240, 78, 48, 0.5);
-        }
-
-        .btn-dark:hover {
-            background-color: #f04e30;
-            border-color: #f04e30;
-        }
-
-        .text-dark:hover {
-            color: #f04e30 !important;
-        }
-    </style>
 
     <!-- Section-->
     <section class="py-5">
@@ -249,24 +230,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/main.js"></script>
-    <style>
-        .card {
-            transition: transform 0.2s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-        .badge {
-            font-size: 0.8rem;
-        }
-        .star-rating {
-            color: #ffc107;
-        }
-    </style>
 </body>
 
 </html>
