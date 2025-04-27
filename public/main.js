@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        cart = JSON.parse(localStorage.getItem("cart")) || [];
         cartItems.innerHTML = "";
         if (cart.length === 0) {
             cartItems.innerHTML = "<li class='list-group-item text-center'>Giỏ hàng trống</li>";
@@ -49,17 +50,18 @@ document.addEventListener("DOMContentLoaded", function () {
             let li = document.createElement("li");
             li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
+            // Sửa dòng này để hiển thị tổng giá cho từng sản phẩm
             li.innerHTML = `
                 <div class="d-flex align-items-center">
                     <img src="${item.thumbnail}" class="img-thumbnail me-2" style="width: 50px; height: 50px; object-fit: cover;" alt="${item.name}">
                     <div>
                         <p class="mb-0"><strong>${item.name}</strong></p>
-                        <p class="mb-0">Size: ${item.size}</p>
+                        <p class="mb-0">Option: ${item.type}</p>
                         <p class="mb-0">Quantity: ${item.quantity}</p>
-                        <p class="mb-0">${formatPrice(item.price)} ₫</p>
+                        <p class="mb-0">Subtotal: ${formatPrice(item.price * item.quantity)} ₫</p>
                     </div>
                 </div>
-                <button class="btn btn-transparent btn-sm remove-item" data-id="${item.id}" data-size="${item.size}">🗑️</button>
+                <button class="btn btn-transparent btn-sm remove-item" data-id="${item.id}" data-type="${item.type}">🗑️</button>
             `;
 
             cartItems.appendChild(li);
@@ -69,15 +71,15 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".remove-item").forEach(button => {
             button.addEventListener("click", function () {
                 let id = this.getAttribute("data-id");
-                let size = this.getAttribute("data-size");
-                removeItem(id, size);
+                let type = this.getAttribute("data-type");
+                removeItem(id, type);
             });
         });
     }
 
     // Function to Remove Item from Cart
-    function removeItem(id, size) {
-        cart = cart.filter(item => !(item.id === id && item.size === size));
+    function removeItem(id, type) {
+        cart = cart.filter(item => !(item.id === id && item.type === type));
         localStorage.setItem("cart", JSON.stringify(cart));
         renderCart();
         updateCartCount();
@@ -86,8 +88,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to Update Cart Count Badge
     function updateCartCount() {
         const cartCountElement = document.getElementById("cartCount");
+        // Always get the latest cart from localStorage
+        const currentCart = JSON.parse(localStorage.getItem("cart")) || [];
         if (cartCountElement) {
-            cartCountElement.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountElement.textContent = currentCart.reduce((sum, item) => sum + item.quantity, 0);
         }
     }
 
@@ -101,39 +105,50 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", function () {
             let id = this.getAttribute("data-id");
             let name = this.getAttribute("data-name");
-            let price = parseFloat(this.getAttribute("data-price"));
             let thumbnail = this.getAttribute("data-thumbnail");
-            let type = this.getAttribute("data-type");
             let quantity = parseInt(document.getElementById("quantityInput").value, 10);
 
-            // Get selected size
-            const selectedSize = document.querySelector(`input[name="sizeOptions-${id}"]:checked`);
-            let size = selectedSize ? selectedSize.value : "No Size";
+            // Lấy variant đã chọn
+            const selectedVariant = document.querySelector('input[name="variantOption"]:checked');
+            if (!selectedVariant) {
+                alert("Please select Option");
+                return;
+            }
+            const variantIdx = selectedVariant.value;
+            // Lấy thông tin variant từ biến toàn cục hoặc từ DOM (nếu cần)
+            const variants = window.productVariants || [];
+            const variant = variants[variantIdx];
+
+            let price = variant ? variant.price : 0;
+            let type = variant ? variant.type : "";
 
             if (!quantity || quantity < 1) {
                 alert("Vui lòng nhập số lượng hợp lệ.");
                 return;
             }
 
-            if (type !== "Accessories" && size === "No Size") {
-                alert("Please select size !")
-                return;
-            }
-
-            // Find if the product with the same ID & size exists
-            let existingProduct = cart.find(item => item.id === id && item.size === size);
+            // Thêm vào giỏ hàng với thuộc tính đồng nhất
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let existingProduct = cart.find(item => item.id === id && item.type === type);
 
             if (existingProduct) {
                 existingProduct.quantity += quantity;
             } else {
-                cart.push({ id, name, price, size, quantity, thumbnail });
+                cart.push({ id, name, price, type, quantity, thumbnail });
             }
 
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartCount();
-            renderCart(); // Update the modal immediately
+            renderCart();
 
-            alert("Sản phẩm đã được thêm vào giỏ hàng!");
+            // Hiển thị modal ngay lập tức nếu có
+            const cartModalElement = document.getElementById("cartModal");
+            if (cartModalElement) {
+                const cartModal = new bootstrap.Modal(cartModalElement);
+                cartModal.show();
+            }
+
+            // alert("Sản phẩm đã được thêm vào giỏ hàng!"); // Có thể bỏ nếu không muốn hiện alert
         });
     });
 });

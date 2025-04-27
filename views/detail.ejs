@@ -137,8 +137,8 @@
                         <% if (product.images && product.images.length > 0) { %>
                             <% product.images.forEach((img, index) => { %>
                                 <div class="slider-item" style="height: 575px;">
-                                    <img class="card-img-top" 
-                                         src="/assets/<%= product.type %>/<%= img %>" 
+                                    <img class="card-img-top"
+                                         src="/<%= img.replace(/\\/g, '/') %>"
                                          alt="<%= product.name %> - Image <%= index + 1 %>"
                                          style="width: 100%; height: 100%; object-fit: contain;" />
                                 </div>
@@ -157,9 +157,10 @@
                 <!-- Thumbnail Images -->
                 <div class="thumbnail-slider mt-3" id="thumbnailSlider">
                     <% product.images.forEach((img, index)=> { %>
-                        <img src="<%= img %>" class="img-fluid rounded thumbnail <%= index === 0 ? 'active' : '' %>"
-                            data-index="<%= index %>" alt="Thumbnail <%= index + 1 %>">
-                        <% }); %>
+                        <img src="/<%= img.replace(/\\/g, '/') %>"
+                             class="img-fluid rounded thumbnail <%= index === 0 ? 'active' : '' %>"
+                             data-index="<%= index %>" alt="Thumbnail <%= index + 1 %>">
+                    <% }); %>
                 </div>
             </div>
 
@@ -190,12 +191,16 @@
                     <!-- Variants -->
                     <div class="mb-4">
                         <h6 class="fw-medium mb-2">Available Options:</h6>
-                        <% product.variants.forEach(variant => { %>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span><%= variant.type %></span>
-                                <span class="fw-bold"><%= variant.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") %> ₫</span>
-                            </div>
-                        <% }); %>
+                        <form id="variantForm">
+                            <% product.variants.forEach((variant, idx) => { %>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="variantOption" id="variant_<%= idx %>" value="<%= idx %>">
+                                    <label class="form-check-label" for="variant_<%= idx %>">
+                                        <%= variant.type %> - <span class="fw-bold"><%= variant.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") %> ₫</span>
+                                    </label>
+                                </div>
+                            <% }); %>
+                        </form>
                     </div>
 
                     <!-- Rating and Reviews -->
@@ -219,7 +224,12 @@
                             <input type="text" class="form-control text-center" id="quantityInput" value="1">
                             <button class="btn btn-outline-dark" type="button" id="increaseQuantity">+</button>
                         </div>
-                        <button class="btn btn-dark flex-grow-1 addToCart" data-id="<%= product._id %>">
+                        <button
+                            class="btn btn-dark flex-grow-1 addToCart"
+                            data-id="<%= product._id %>"
+                            data-name="<%= product.name %>"
+                            data-thumbnail="/<%= product.images && product.images.length > 0 ? product.images[0].replace(/\\/g, '/') : 'assets/placeholder.jpg' %>"
+                        >
                             <i class="bi bi-cart-fill me-2"></i>Add to Cart
                         </button>
                     </div>
@@ -260,37 +270,55 @@
                 <div class="tab-content p-4 border border-top-0 rounded-bottom" id="productTabsContent">
                     <div class="tab-pane fade show active" id="description" role="tabpanel"
                         aria-labelledby="description-tab">
-                        <p>This premium cotton t-shirt combines style and comfort for everyday wear. Crafted with 100%
-                            organic cotton, it features a classic cut with a modern fit that flatters all body types.
-                        </p>
-                        <p>The breathable fabric ensures all-day comfort, whether you're running errands or meeting
-                            friends for coffee. The relaxed fit provides freedom of movement while maintaining a stylish
-                            silhouette.</p>
-                        <p>Pre-shrunk and machine washable, this t-shirt is designed to last through countless wears and
-                            washes without losing its shape or color vibrancy.</p>
+                        <p><strong><%= product.short_description %></strong></p>
+                        <p><%= product.description %></p>
                     </div>
                     <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
                         <div class="row">
                             <div class="col-12 col-md-6">
                                 <h5 class="fw-medium mb-3">Product Specifications</h5>
                                 <ul class="list-unstyled">
-                                    <li class="mb-2"><span class="fw-medium">Material:</span> 100% Organic Cotton</li>
-                                    <li class="mb-2"><span class="fw-medium">Weight:</span> 180 GSM</li>
-                                    <li class="mb-2"><span class="fw-medium">Fit:</span> Regular</li>
-                                    <li class="mb-2"><span class="fw-medium">Neckline:</span> Crew Neck</li>
-                                    <li class="mb-2"><span class="fw-medium">Sleeve Type:</span> Short Sleeve</li>
-                                    <li class="mb-2"><span class="fw-medium">Pattern:</span> Solid</li>
+                                    <% if (product.specifications) { %>
+                                        <% if (product.specifications.cpu_series) { %>
+                                            <li class="mb-2"><span class="fw-medium">CPU Series:</span> <%= product.specifications.cpu_series %></li>
+                                        <% } %>
+                                        <% if (product.specifications.ram_capacity) { %>
+                                            <li class="mb-2"><span class="fw-medium">RAM Capacity:</span> <%= product.specifications.ram_capacity %></li>
+                                        <% } %>
+                                        <% if (product.specifications.ram_type) { %>
+                                            <li class="mb-2"><span class="fw-medium">RAM Type:</span> <%= product.specifications.ram_type %></li>
+                                        <% } %>
+                                        <% if (product.specifications.ram_brand) { %>
+                                            <li class="mb-2"><span class="fw-medium">RAM Brand:</span> <%= product.specifications.ram_brand %></li>
+                                        <% } %>
+                                        <% if (product.specifications.ssd_brand) { %>
+                                            <li class="mb-2"><span class="fw-medium">SSD Brand:</span> <%= product.specifications.ssd_brand %></li>
+                                        <% } %>
+                                        <% if (product.specifications.ssd_capacity) { %>
+                                            <li class="mb-2"><span class="fw-medium">SSD Capacity:</span> <%= product.specifications.ssd_capacity %></li>
+                                        <% } %>
+                                        <% if (product.specifications.hdd_brand) { %>
+                                            <li class="mb-2"><span class="fw-medium">HDD Brand:</span> <%= product.specifications.hdd_brand %></li>
+                                        <% } %>
+                                        <% if (product.specifications.hdd_capacity) { %>
+                                            <li class="mb-2"><span class="fw-medium">HDD Capacity:</span> <%= product.specifications.hdd_capacity %></li>
+                                        <% } %>
+                                        <% if (product.specifications.storage_type) { %>
+                                            <li class="mb-2"><span class="fw-medium">Storage Type:</span> <%= product.specifications.storage_type %></li>
+                                        <% } %>
+                                    <% } else { %>
+                                        <li class="mb-2">No specifications available.</li>
+                                    <% } %>
                                 </ul>
                             </div>
                             <div class="col-12 col-md-6">
                                 <h5 class="fw-medium mb-3">Care Instructions</h5>
                                 <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="fas fa-tint text-muted me-2"></i> Machine wash cold</li>
-                                    <li class="mb-2"><i class="fas fa-ban text-muted me-2"></i> Do not bleach</li>
-                                    <li class="mb-2"><i class="fas fa-temperature-low text-muted me-2"></i> Tumble dry
-                                        low</li>
-                                    <li class="mb-2"><i class="fas fa-iron text-muted me-2"></i> Iron on low heat</li>
-                                    <li class="mb-2"><i class="fas fa-times text-muted me-2"></i> Do not dry clean</li>
+                                    <li class="mb-2"><i class="fas fa-plug text-muted me-2"></i> Unplug device before cleaning</li>
+                                    <li class="mb-2"><i class="fas fa-tint-slash text-muted me-2"></i> Keep away from liquids and moisture</li>
+                                    <li class="mb-2"><i class="fas fa-thermometer-half text-muted me-2"></i> Avoid extreme temperatures</li>
+                                    <li class="mb-2"><i class="fas fa-bolt text-muted me-2"></i> Use a surge protector</li>
+                                    <li class="mb-2"><i class="fas fa-box-open text-muted me-2"></i> Store in a dry, dust-free environment</li>
                                 </ul>
                             </div>
                         </div>
@@ -300,7 +328,43 @@
             </div>
         </div>
 
-        <!-- You May Also Like Section -->
+            <!-- User Reviews & Comments Section -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3 class="fw-medium mb-4">Customer Reviews</h3>
+                    <!-- Button to toggle comment form -->
+                    <button class="btn btn-outline-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#reviewCollapse" aria-expanded="false" aria-controls="reviewCollapse">
+                        Leave a Review
+                    </button>
+                    <!-- Collapsible comment/rating form -->
+                    <div class="collapse" id="reviewCollapse">
+                        <div class="card card-body mb-4">
+                            <form id="reviewForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Your Rating:</label>
+                                    <div id="starRating" class="mb-2">
+                                        <% for(let i=1; i<=5; i++) { %>
+                                            <i class="bi bi-star star-rating" data-value="<%= i %>" style="font-size: 1.5rem; color: #ccc; cursor: pointer;"></i>
+                                        <% } %>
+                                    </div>
+                                    <input type="hidden" name="rating" id="ratingInput" value="0">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">Your Comment:</label>
+                                    <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Placeholder for comments list -->
+                    <div id="commentsList">
+                        <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- You May Also Like Section -->
         <div class="row mt-5">
             <div class="col-12">
                 <h3 class="fw-medium mb-4">You May Also Like</h3>
@@ -332,7 +396,7 @@
                     <!-- Related Product 3 -->
                     <div class="col">
                         <div class="card h-100">
-                            <img src="../assets/LAPTOP/LenovoLegion5_1.webp" class="card-img-top" alt="Related Product 3">
+                            <img src="../assets/LAPTOP/LenovoLegion5_2.webp" class="card-img-top" alt="Related Product 3">
                             <div class="card-body">
                                 <h6 class="card-title">Long Sleeve Polo Shirt</h6>
 
@@ -382,6 +446,114 @@
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/main.js"></script>
+    <script>
+        document.querySelector('.addToCart').addEventListener('click', function (e) {
+            const variantIdx = document.querySelector('input[name="variantOption"]:checked');
+            const quantity = document.getElementById('quantityInput').value;
+            if (!variantIdx) {
+                alert('Please select Option');
+                return;
+            }
+            // You can now use variantIdx.value (index of selected variant) and quantity
+            // Example: send to your cart logic via AJAX or form submission
+            // Example:
+            // addToCart(productId, variantIdx.value, quantity);
+        });
+    </script>
+    <script>
+        window.productVariants = JSON.parse('<%- JSON.stringify(product.variants) %>');
+
+        document.querySelectorAll('.star-rating').forEach(star => {
+            star.addEventListener('mouseover', function () {
+                const val = parseInt(this.getAttribute('data-value'));
+                document.querySelectorAll('.star-rating').forEach(s => {
+                    s.style.color = parseInt(s.getAttribute('data-value')) <= val ? '#ffc107' : '#ccc';
+                });
+            });
+            star.addEventListener('mouseout', function () {
+                const selected = parseInt(document.getElementById('ratingInput').value);
+                document.querySelectorAll('.star-rating').forEach(s => {
+                    s.style.color = parseInt(s.getAttribute('data-value')) <= selected ? '#ffc107' : '#ccc';
+                });
+            });
+            star.addEventListener('click', function () {
+                const val = parseInt(this.getAttribute('data-value'));
+                document.getElementById('ratingInput').value = val;
+                document.querySelectorAll('.star-rating').forEach(s => {
+                    s.style.color = parseInt(s.getAttribute('data-value')) <= val ? '#ffc107' : '#ccc';
+                });
+            });
+        });
+
+        // Unique key for this product's reviews
+        const productId = "<%= product._id %>";
+        const reviewsKey = `product_reviews_${productId}`;
+
+        // Function to render reviews from localStorage
+        function renderReviews() {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = '';
+            const reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            if (reviews.length === 0) {
+                commentsList.innerHTML = '<p class="text-muted">No reviews yet. Be the first to review this product!</p>';
+                return;
+            }
+            reviews.slice().reverse().forEach(review => {
+                const reviewHTML = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                ${'<i class="bi bi-star-fill text-warning"></i>'.repeat(review.rating)}
+                                ${'<i class="bi bi-star text-warning"></i>'.repeat(5 - review.rating)}
+                            </div>
+                            <p class="mb-0">${review.comment.replace(/\n/g, '<br>')}</p>
+                            <small class="text-muted">${review.time || 'Just now'}</small>
+                        </div>
+                    </div>
+                `;
+                commentsList.insertAdjacentHTML('beforeend', reviewHTML);
+            });
+        }
+
+        // Render reviews on page load
+        renderReviews();
+
+        // Handle review form submission and display new comment instantly
+        document.getElementById('reviewForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const rating = parseInt(document.getElementById('ratingInput').value);
+            const comment = document.getElementById('comment').value.trim();
+            if (!rating || !comment) {
+                alert('Please provide both a rating and a comment.');
+                return;
+            }
+
+            // Get current reviews, add new one
+            const reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            const now = new Date();
+            reviews.push({
+                rating,
+                comment,
+                time: now.toLocaleString()
+            });
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+
+            // Re-render reviews
+            renderReviews();
+
+            // Reset form
+            document.getElementById('reviewForm').reset();
+            document.getElementById('ratingInput').value = 0;
+            document.querySelectorAll('.star-rating').forEach(s => {
+                s.style.color = '#ccc';
+            });
+
+            // Optionally collapse the form
+            var reviewCollapse = bootstrap.Collapse.getOrCreateInstance(document.getElementById('reviewCollapse'));
+            reviewCollapse.hide();
+        });
+    </script>
+   
 </body>
 
 </html>
