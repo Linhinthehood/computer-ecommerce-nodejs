@@ -6,6 +6,7 @@ exports.getAllProducts = async (req, res) => {
 
     let filter = {};
     let sortOption = {};
+    let products;
 
     // Lọc theo loại sản phẩm (nếu có)
     if (req.query.type) {
@@ -67,11 +68,6 @@ exports.getProductByID = async (req, res) => {
 };
 
 
-
-
-
-
-
 exports.searchProducts = async (req, res) => {
   try {
     const searchQuery = req.query.query;
@@ -114,7 +110,7 @@ exports.getLaptops = async (req, res) => {
       sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
     }
 
-    const products = await Product.find({ category: "Laptop" }).sort(sortOption);
+    const products = await Product.find({ category: "LAPTOP" }).sort(sortOption);
 
     console.log("Laptops found:", products.length);
 
@@ -279,4 +275,5 @@ exports.getCheckout = (req, res) => {
     return res.redirect('/auth');
   }
   const cart = req.session.cart || [];
-  res.render('checkout', { cart, user: req.session.user });};
+  res.render('checkout', { cart, user: req.session.user });
+};

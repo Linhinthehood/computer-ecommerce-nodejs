@@ -66,7 +66,7 @@ const productSchema = new mongoose.Schema({
   category: { 
     type: String, 
     required: true, 
-    enum: ['Laptop', 'CPU', 'RAM', 'SSD', 'HDD']
+    enum: ['LAPTOP', 'CPU', 'RAM', 'SSD', 'HDD']
   },
   tags: [String],
   images: {
