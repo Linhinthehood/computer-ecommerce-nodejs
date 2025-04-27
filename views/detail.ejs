@@ -216,12 +216,20 @@
                         <i class="fas fa-chevron-left"></i>
                     </button>
                     <div class="slider-container" id="imageSlider">
-                        <% product.images.forEach((img, index)=> { %>
-                            <div class="slider-item" style="height: 575px;">
-                                <img src="<%= img %>" class="img-fluid rounded"
-                                    alt="<%= product.name %> - View <%= index + 1 %>">
-                            </div>
+                        <% if (product.images && product.images.length > 0) { %>
+                            <% product.images.forEach((img, index) => { %>
+                                <div class="slider-item" style="height: 575px;">
+                                    <img class="card-img-top" 
+                                         src="/assets/<%= product.type %>/<%= img %>" 
+                                         alt="<%= product.name %> - Image <%= index + 1 %>"
+                                         style="width: 100%; height: 100%; object-fit: contain;" />
+                                </div>
                             <% }); %>
+                        <% } else { %>
+                            <div class="slider-item">
+                                <img class="card-img-top" src="/assets/placeholder.jpg" alt="No image available" />
+                            </div>
+                        <% } %>
                     </div>
                     <button class="slider-nav slider-nav-right" id="nextSlide">
                         <i class="fas fa-chevron-right"></i>
@@ -240,85 +248,79 @@
             <!-- Product Details Section -->
             <div class="col-12 col-md-6">
                 <div class="ps-md-4">
-                    <!-- Brand -->
-                    <div class="text-muted mb-1">We Sell Clothes Collection</div>
+                    <!-- Brand & Category -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="badge bg-secondary"><%= product.brand %></span>
+                        <span class="badge bg-primary"><%= product.category %></span>
+                    </div>
 
                     <!-- Product Title -->
                     <h2 class="fw-medium mb-2">
                         <%= product.name %>
                     </h2>
 
-                    <!-- Price -->
-                    <div class="fs-4 mb-3">
-                        <span class="text fw-medium">
-                            <p class="fs-5">
-                                <%= product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "." ) %> ₫
-                            </p>
-                        </span>
+                    <!-- Short Description -->
+                    <p class="card-text mb-3"><%= product.short_description %></p>
+
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        <% product.tags.forEach(tag => { %>
+                            <span class="badge bg-light text-dark me-1">#<%= tag %></span>
+                        <% }); %>
                     </div>
 
-                    <!-- Description -->
-                    <p class="mb-4">
-                        A premium quality, comfortable cotton t-shirt that's perfect for everyday wear.
-                        Made from 100% organic cotton with a relaxed fit and breathable fabric.
-                    </p>
-
-                    <!-- Conditionally Show Size Options -->
-                    <% if (product.type !=="Accessories" ) { %>
-                        <div class="mb-4">
-                            <h6 class="fw-medium">Size:</h6>
-                            <div class="btn-group" role="group" aria-label="Size options" id="sizeInput">
-                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
-                                    id="sizeS-<%= product._id %>" value="S" autocomplete="off">
-                                <label class="btn btn-outline-dark" for="sizeS-<%= product._id %>">S</label>
-
-                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
-                                    id="sizeM-<%= product._id %>" value="M" autocomplete="off">
-                                <label class="btn btn-outline-dark" for="sizeM-<%= product._id %>">M</label>
-
-                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
-                                    id="sizeL-<%= product._id %>" value="L" autocomplete="off">
-                                <label class="btn btn-outline-dark" for="sizeL-<%= product._id %>">L</label>
-
-                                <input type="radio" class="btn-check" name="sizeOptions-<%= product._id %>"
-                                    id="sizeXL-<%= product._id %>" value="XL" autocomplete="off">
-                                <label class="btn btn-outline-dark" for="sizeXL-<%= product._id %>">XL</label>
+                    <!-- Variants -->
+                    <div class="mb-4">
+                        <h6 class="fw-medium mb-2">Available Options:</h6>
+                        <% product.variants.forEach(variant => { %>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span><%= variant.type %></span>
+                                <span class="fw-bold"><%= variant.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") %> ₫</span>
                             </div>
+                        <% }); %>
+                    </div>
+
+                    <!-- Rating and Reviews -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <% for(let i = 0; i < Math.floor(product.average_rating); i++) { %>
+                                <i class="bi bi-star-fill text-warning"></i>
+                            <% } %>
+                            <% if(product.average_rating % 1 !== 0) { %>
+                                <i class="bi bi-star-half text-warning"></i>
+                            <% } %>
+                            <span class="ms-1">(<%= product.average_rating %>)</span>
                         </div>
-                        <% } %>
+                        <span class="text-muted"><%= product.total_reviews %> reviews</span>
+                    </div>
 
-                            <div class="d-flex mb-4 align-items-center">
-                                <!-- Quantity -->
-                                <div class="input-group me-3" style="width: 130px;">
-                                    <button class="btn btn-outline-dark" type="button" id="decreaseQuantity">-</button>
-                                    <input type="text" class="form-control text-center" id="quantityInput" value="1">
-                                    <button class="btn btn-outline-dark" type="button" id="increaseQuantity">+</button>
-                                </div>
-                                <!-- Add to Cart Button -->
-                                <button class="btn btn-success flex-grow-1 addToCart" data-id="<%= product._id %>"
-                                    data-name="<%= product.name %>" data-price="<%= product.price %>"
-                                    data-thumbnail="<%= product.thumbnail %>" data-type="<%= product.type %>">
-                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                                </button>
-                            </div>
+                    <!-- Quantity and Add to Cart -->
+                    <div class="d-flex mb-4 align-items-center">
+                        <div class="input-group me-3" style="width: 130px;">
+                            <button class="btn btn-outline-dark" type="button" id="decreaseQuantity">-</button>
+                            <input type="text" class="form-control text-center" id="quantityInput" value="1">
+                            <button class="btn btn-outline-dark" type="button" id="increaseQuantity">+</button>
+                        </div>
+                        <button class="btn btn-dark flex-grow-1 addToCart" data-id="<%= product._id %>">
+                            <i class="bi bi-cart-fill me-2"></i>Add to Cart
+                        </button>
+                    </div>
 
-                            <!-- Additional Info -->
-                            <div class="d-flex flex-wrap mb-4">
-                                <div class="me-4 mb-2">
-                                    <i class="fas fa-truck text-muted me-2"></i>
-                                    <span>Free shipping</span>
-                                </div>
-                                <div class="me-4 mb-2">
-                                    <i class="fas fa-undo text-muted me-2"></i>
-                                    <span>30 days return</span>
-                                </div>
-                                <div class="mb-2">
-                                    <i class="fas fa-check-circle text-muted me-2"></i>
-                                    <span>In stock</span>
-                                </div>
-                            </div>
-
-
+                    <!-- Additional Info -->
+                    <div class="d-flex flex-wrap">
+                        <div class="me-4 mb-2">
+                            <i class="fas fa-truck text-muted me-2"></i>
+                            <span>Free shipping</span>
+                        </div>
+                        <div class="me-4 mb-2">
+                            <i class="fas fa-undo text-muted me-2"></i>
+                            <span>30 days return</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-check-circle text-muted me-2"></i>
+                            <span>Quality guaranteed</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -388,7 +390,7 @@
                     <!-- Related Product 1 -->
                     <div class="col">
                         <div class="card h-100">
-                            <img src="/assets/shirts/Hoodies1.png" class="card-img-top" alt="Related Product 1">
+                            <img src="../assets/LAPTOP/ASUSTUFGamingA15_1.webp" class="card-img-top" alt="Related Product 1">
                             <div class="card-body">
                                 <h6 class="card-title ">Slim Fit Jeans</h6>
 
@@ -400,7 +402,7 @@
                     <!-- Related Product 2 -->
                     <div class="col">
                         <div class="card h-100">
-                            <img src="/assets/shirts/Hoodies2.png" class="card-img-top" alt="Related Product 2">
+                            <img src="../assets/LAPTOP/DELLInspiron16 lus_2.webp" class="card-img-top" alt="Related Product 2">
                             <div class="card-body">
                                 <h6 class="card-title">Casual Hooded Sweatshirt</h6>
 
@@ -412,7 +414,7 @@
                     <!-- Related Product 3 -->
                     <div class="col">
                         <div class="card h-100">
-                            <img src="/assets/shirts/Shirt1.png" class="card-img-top" alt="Related Product 3">
+                            <img src="../assets/LAPTOP/LenovoLegion5_1.webp" class="card-img-top" alt="Related Product 3">
                             <div class="card-body">
                                 <h6 class="card-title">Long Sleeve Polo Shirt</h6>
 
@@ -424,7 +426,7 @@
                     <!-- Related Product 4 -->
                     <div class="col">
                         <div class="card h-100">
-                            <img src="/assets/shirts/Tanktop1.png" class="card-img-top" alt="Related Product 4">
+                            <img src="../assets/RAM/RAMKingstonFuryBeast16GBDDR4_2.webp" class="card-img-top" alt="Related Product 4">
                             <div class="card-body">
                                 <h6 class="card-title">Lightweight Jacket</h6>
 

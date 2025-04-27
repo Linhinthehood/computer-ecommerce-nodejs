@@ -95,35 +95,37 @@ exports.searchProducts = async (req, res) => {
   }
 };
 
-
-
-
-
-exports.getLaptops = async (req, res) => {
+exports.getProductsByCategory = async (req, res) => {
   try {
-    console.log("Fetching only laptops...");
+    const category = req.params.category.toUpperCase();
+    console.log(`Fetching ${category} products...`);
 
     let sortOption = {};
     if (req.query.sort === "asc") {
-      sortOption = { "variants.0.price": 1 }; // Sort by first variant's price ascending
+      sortOption = { "variants.0.price": 1 };
     } else if (req.query.sort === "desc") {
-      sortOption = { "variants.0.price": -1 }; // Sort by first variant's price descending
+      sortOption = { "variants.0.price": -1 };
     }
 
-    const products = await Product.find({ category: "LAPTOP" }).sort(sortOption);
-
-    console.log("Laptops found:", products.length);
+    const products = await Product.find({ category }).sort(sortOption);
+    console.log(`${category} found:`, products.length);
 
     if (products.length === 0) {
-      console.log("No laptops found in database");
+      console.log(`No ${category} found in database`);
     }
 
-    res.render("laptop", { products, user: req.session.user });
+    res.render("productCategory", { 
+      products, 
+      user: req.session.user,
+      category: category
+    });
   } catch (error) {
-    console.error("Error in getLaptops:", error);
+    console.error(`Error in get${category}:`, error);
     res.status(500).json({ message: "Server error", error: error.toString() });
   }
 };
+
+// Remove individual category handlers (getLaptops, getRAMs, etc.)
 
 exports.getRAMs = async (req, res) => {
   try {

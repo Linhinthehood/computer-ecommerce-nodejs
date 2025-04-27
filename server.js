@@ -142,19 +142,19 @@ app.use('/', authRoutes);
 const productRoutes = require('./routes/productRoutes');
 app.use('/', productRoutes);
 
-const laptop_page = require('./routes/laptopRoutes');
+const laptop_page = require('./routes/productRoutes');
 app.use('/', laptop_page);
 
-const ram_page = require('./routes/ramRoutes');
+const ram_page = require('./routes/productRoutes');
 app.use('/', ram_page);
 
-const cpu_page = require('./routes/cpu');
+const cpu_page = require('./routes/productRoutes');
 app.use('/', cpu_page);
 
-const ssd_page = require('./routes/ssdRoutes');
+const ssd_page = require('./routes/productRoutes');
 app.use('/', ssd_page);
 
-const hdd_page = require('./routes/hddRoutes');
+const hdd_page = require('./routes/productRoutes');
 app.use('/', hdd_page);
 
 const aboutus_page = require('./routes/aboutusRouters');
