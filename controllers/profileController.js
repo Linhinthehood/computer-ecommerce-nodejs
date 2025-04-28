@@ -174,4 +174,137 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+/**
+ * POST /profile/addresses
+ * Add a new shipping address
+ */
+exports.addAddress = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const addressData = {
+      name: req.body.name,
+      street: req.body.street,
+      ward: req.body.ward,
+      district: req.body.district,
+      city: req.body.city,
+      isDefault: req.body.isDefault || false
+    };
+
+    await user.addAddress(addressData);
+    
+    return res.status(201).json({
+      message: 'Address added successfully',
+      addresses: user.addresses
+    });
+  } catch (error) {
+    console.error('Error adding address:', error);
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+/**
+ * PUT /profile/addresses/:addressId
+ * Update a shipping address
+ */
+exports.updateAddress = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const { addressId } = req.params;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updateData = {
+      name: req.body.name,
+      street: req.body.street,
+      ward: req.body.ward,
+      district: req.body.district,
+      city: req.body.city,
+      isDefault: req.body.isDefault
+    };
+
+    await user.updateAddress(addressId, updateData);
+    
+    return res.status(200).json({
+      message: 'Address updated successfully',
+      addresses: user.addresses
+    });
+  } catch (error) {
+    console.error('Error updating address:', error);
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+/**
+ * DELETE /profile/addresses/:addressId
+ * Remove a shipping address
+ */
+exports.removeAddress = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const { addressId } = req.params;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.removeAddress(addressId);
+    
+    return res.status(200).json({
+      message: 'Address removed successfully',
+      addresses: user.addresses
+    });
+  } catch (error) {
+    console.error('Error removing address:', error);
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+/**
+ * PUT /profile/addresses/:addressId/default
+ * Set an address as default
+ */
+exports.setDefaultAddress = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const { addressId } = req.params;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Set all addresses to non-default first
+    user.addresses.forEach(addr => {
+      addr.isDefault = false;
+    });
+
+    // Find and set the specified address as default
+    const address = user.addresses.id(addressId);
+    if (!address) {
+      return res.status(404).json({ error: 'Address not found' });
+    }
+    
+    address.isDefault = true;
+    await user.save();
+    
+    return res.status(200).json({
+      message: 'Default address updated successfully',
+      addresses: user.addresses
+    });
+  } catch (error) {
+    console.error('Error setting default address:', error);
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 

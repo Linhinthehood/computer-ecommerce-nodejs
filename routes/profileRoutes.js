@@ -18,4 +18,10 @@ router.post('/profile/update',
     profileController.updateProfile
 );
 
+// Address management routes
+router.post('/profile/addresses', isAuthenticated, profileController.addAddress);
+router.put('/profile/addresses/:addressId', isAuthenticated, profileController.updateAddress);
+router.delete('/profile/addresses/:addressId', isAuthenticated, profileController.removeAddress);
+router.put('/profile/addresses/:addressId/default', isAuthenticated, profileController.setDefaultAddress);
+
 module.exports = router;
