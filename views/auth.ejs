@@ -47,11 +47,36 @@
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
+      max-height: 150px; /* Chiều cao cố định */
+      overflow-y: auto; /* Cho phép scroll dọc */
+    }
+
+    .address-section::-webkit-scrollbar {
+      width: 8px; /* Độ rộng của thanh scroll */
+    }
+
+    .address-section::-webkit-scrollbar-track {
+      background: #f1f1f1; /* Màu nền của track */
+      border-radius: 4px;
+    }
+
+    .address-section::-webkit-scrollbar-thumb {
+      background: #888; /* Màu của thumb */
+      border-radius: 4px;
+    }
+
+    .address-section::-webkit-scrollbar-thumb:hover {
+      background: #555; /* Màu của thumb khi hover */
     }
 
     .address-section h6 {
       margin-bottom: 15px;
       color: #495057;
+      position: sticky; /* Giữ tiêu đề cố định khi scroll */
+      top: 0;
+      background-color: #f8f9fa;
+      padding: 5px 0;
+      z-index: 1;
     }
 
     .form-text {
@@ -97,7 +122,9 @@
                   </div>
                 <% } %>
                 <div class="mb-3">
-                  <a href="#!">Forgot password?</a>
+                  <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                    Forgot password?
+                  </button>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Login</button>
               </form>
@@ -187,6 +214,42 @@
         <div class="modal-footer">
           <button id="clearCart" class="btn btn-danger me-auto">Xóa tất cả</button>
           <a href="/cart" class="btn btn-primary">Go to Cart</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <% if (messages.error) { %>
+            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+              <%= messages.error %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          <% if (messages.success) { %>
+            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+              <%= messages.success %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% } %>
+          <form action="/forgot-password" method="POST" id="forgotPasswordForm">
+            <div class="mb-3">
+              <label for="resetEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="resetEmail" name="email" required>
+              <div class="form-text">Enter your email address and we'll send you a temporary password.</div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Send Reset Link</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

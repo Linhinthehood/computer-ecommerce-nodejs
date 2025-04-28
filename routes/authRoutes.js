@@ -7,7 +7,8 @@ const router = express.Router();
 const {
   getAuthPage,
   postRegister,
-  postLogin
+  postLogin,
+  postForgotPassword
 } = require('../controllers/authControllers');
 
 // GET /auth => render trang auth.ejs
@@ -18,6 +19,9 @@ router.post('/register', postRegister);
 
 // POST /login => xử lý đăng nhập
 router.post('/login', postLogin);
+
+// POST /forgot-password => xử lý quên mật khẩu
+router.post('/forgot-password', postForgotPassword);
 
 // GET /logout => handle logout
 router.get('/logout', (req, res) => {

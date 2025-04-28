@@ -239,3 +239,58 @@ exports.postLogin = async (req, res) => {
     });
   }
 };
+
+/**
+ * POST /forgot-password
+ * Handle forgot password
+ */
+exports.postForgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Find user
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      if (req.headers['content-type'] === 'application/json') {
+        return res.status(404).json({ error: 'Email not found.' });
+      }
+      req.flash('error', 'Email not found.');
+      return res.redirect('/auth');
+    }
+
+    // Generate new temporary password
+    const tempPassword = generateRandomPassword();
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(tempPassword, saltRounds);
+
+    // Update user password and set change required flag
+    user.password = hashedPassword;
+    user.passwordChangeRequired = true;
+    await user.save();
+
+    // Send password reset email
+    await emailService.sendPasswordResetEmail({
+      name: user.name,
+      email: user.email,
+      password: tempPassword
+    });
+
+    if (req.headers['content-type'] === 'application/json') {
+      return res.status(200).json({
+        message: 'Password reset successful. Please check your email for the temporary password.'
+      });
+    }
+
+    // Set flash message and redirect
+    req.flash('success', 'Password reset successful. Please check your email for the temporary password.');
+    return res.redirect('/auth');
+
+  } catch (err) {
+    console.error(err);
+    if (req.headers['content-type'] === 'application/json') {
+      return res.status(500).json({ error: 'Password reset failed. Please try again.' });
+    }
+    req.flash('error', 'Password reset failed. Please try again.');
+    return res.redirect('/auth');
+  }
+};
